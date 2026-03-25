@@ -355,7 +355,7 @@ class AsyncOutputInitSignalOutputNode:
     CATEGORY = f'{MAIN_CATEGORY}/WorkFlowTool'
     FUNCTION = "init_signal"
     
-    def init_signal(self, mode, unique_id, prompt, extra_pnginfo):
+    def init_signal(self, always_output, unique_id, prompt, extra_pnginfo):
 
         WORKFLOW = "workflow"
         EXTRA = "extra"
@@ -367,7 +367,7 @@ class AsyncOutputInitSignalOutputNode:
                             extra_pnginfo[WORKFLOW][EXTRA][ASYNC_OUTPUT_EXTRA_KEY][ASYNC_OUTPUT_INIT_SINGAL_KEY] = True
                             return (True, )
                         else:
-                            if mode == True:
+                            if always_output == True:
                                 return (False, )
     
         return (comfy_execution.graph.ExecutionBlocker(None), )
@@ -375,5 +375,5 @@ class AsyncOutputInitSignalOutputNode:
         
     
     @classmethod
-    def IS_CHANGED(s, mode, unique_id, prompt, extra_pnginfo):
+    def IS_CHANGED(s, always_output, unique_id, prompt, extra_pnginfo):
 	    return float('nan')
