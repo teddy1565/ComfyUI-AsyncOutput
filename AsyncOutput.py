@@ -214,8 +214,8 @@ class AsyncOutputConvertStringListToStringNode:
             raise Exception("ERROR: input_string_list not a list.")
         
         result = join_word
-        result.join(input_string_list)
-        
+        result = result.join(input_string_list)
+
         return result
             
 
