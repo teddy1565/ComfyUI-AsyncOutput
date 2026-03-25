@@ -32,15 +32,17 @@ ASYNC_OUTPUT_EXTRA_KEY = "ASYNC_OUTPUT"
 ASYNC_OUTPUT_INIT_SINGAL_KEY = "INIT_SIGNAL"
 
 def onprompt(json_data):
+    
+    data_info = json_data.workflow.extra
 
-    if ASYNC_OUTPUT_EXTRA_KEY not in json_data.extra:
-        json_data.extra[ASYNC_OUTPUT_EXTRA_KEY] = {}
+    if ASYNC_OUTPUT_EXTRA_KEY not in data_info:
+        data_info[ASYNC_OUTPUT_EXTRA_KEY] = {}
 
-    ASYNC_OUTPUT_EXTRA_DICT = json_data.extra[ASYNC_OUTPUT_EXTRA_KEY]
+    ASYNC_OUTPUT_EXTRA_DICT = data_info[ASYNC_OUTPUT_EXTRA_KEY]
 
     if ASYNC_OUTPUT_INIT_SINGAL_KEY not in ASYNC_OUTPUT_EXTRA_DICT:
         ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
-    json_data.extra[ASYNC_OUTPUT_EXTRA_KEY][ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
+    data_info[ASYNC_OUTPUT_EXTRA_KEY][ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
 
     return json_data
 
