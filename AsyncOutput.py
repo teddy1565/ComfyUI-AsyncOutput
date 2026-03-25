@@ -261,6 +261,9 @@ class AsyncOutputMultiLineTextWithBatchNode:
                 "delimiter": ("STRING", { "multiline": False, "default": "\n" }),
                 "skip_empty": ("BOOLEAN", { "default": True }),
             },
+            "optional": {
+                "remove_words": ("*", { "forceInput": True })
+            },
             "hidden": {
                 "unique_id": "UNIQUE_ID"
             }
@@ -271,10 +274,7 @@ class AsyncOutputMultiLineTextWithBatchNode:
     CATEGORY = f'{MAIN_CATEGORY}/WorkFlowTool'
     FUNCTION = "batch_text_yield"
     
-    def batch_text_yield(self, touch, eof_size, text, remove_words, delimiter="\n", skip_empty=True, unique_id=0):
-
-        if isinstance(remove_words, list) == False:
-            raise Exception(f'ERROR: "remove_words" data type not "list". remove_words: {type(remove_words)}')
+    def batch_text_yield(self, touch, eof_size, text, delimiter="\n", skip_empty=True, unique_id=0, remove_words=[]):
         
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
 
@@ -296,12 +296,14 @@ class AsyncOutputMultiLineTextWithBatchNode:
             del ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id]
 
         current_line_promts = prompts[current_line_index]
-        for word in remove_words:
-            if isinstance(word, str):
-                current_line_promts = current_line_promts.replace(word, "")
         
+        if isinstance(remove_words, list):
+            for word in remove_words:
+                if isinstance(word, str):
+                    current_line_promts = current_line_promts.replace(word, "")
+
         return (current_line_promts,)
     
     @classmethod
-    def IS_CHANGED(s, touch, eof_size, text, remove_words, delimiter="\n", skip_empty=True, unique_id=0):
+    def IS_CHANGED(s, touch, eof_size, text, delimiter="\n", skip_empty=True, unique_id=0, remove_words=[]):
 	    return float('nan')
