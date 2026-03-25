@@ -274,7 +274,7 @@ class AsyncOutputMultiLineTextWithBatchNode:
     CATEGORY = f'{MAIN_CATEGORY}/WorkFlowTool'
     FUNCTION = "batch_text_yield"
     
-    def batch_text_yield(self, touch, eof_size, text, delimiter="\n", skip_empty=True, unique_id=0, remove_words=[]):
+    def batch_text_yield(self, touch, eof_size, text, delimiter="\n", skip_empty=True, remove_words=[], unique_id=0):
         
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
 
@@ -305,5 +305,5 @@ class AsyncOutputMultiLineTextWithBatchNode:
         return (current_line_promts,)
     
     @classmethod
-    def IS_CHANGED(s, touch, eof_size, text, delimiter="\n", skip_empty=True, unique_id=0, remove_words=[]):
+    def IS_CHANGED(s, touch, eof_size, text, delimiter="\n", skip_empty=True, remove_words=[], unique_id=0):
 	    return float('nan')
