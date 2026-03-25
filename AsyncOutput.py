@@ -198,7 +198,7 @@ class AsyncOutputConvertStringListToStringNode:
         return {
             "required": {
                 "input_string_list": ("LIST", { "forceInput": True }),
-                "join_word": ("STRING", { "default": "\n" })
+                "join_word": ("STRING", { "default": "" })
             }
         }
     
@@ -208,7 +208,7 @@ class AsyncOutputConvertStringListToStringNode:
     CATEGORY = f'{MAIN_CATEGORY}/Utils'
     FUNCTION = "convert_string_list_to_string"
     
-    def convert_string_list_to_string(self, input_string_list=[], join_word="\n"):
+    def convert_string_list_to_string(self, input_string_list=[], join_word=""):
         
         if isinstance(input_string_list, list) == False:
             raise Exception("ERROR: input_string_list not a list.")
@@ -216,6 +216,6 @@ class AsyncOutputConvertStringListToStringNode:
         result = join_word
         result = result.join(input_string_list)
 
-        return result
+        return (result, )
             
 
