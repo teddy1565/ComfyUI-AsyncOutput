@@ -23,6 +23,7 @@ MAIN_CATEGORY = "AsyncOutput"
 
 ASYNC_OUTPUT_STORAGE_DATA = {}
 ASYNC_OUTPUT_COUNTER = {}
+ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT = {}
 
 class AsyncOutputCollectionNode:
     def __init__(self):
@@ -245,4 +246,58 @@ support list:
 
         return (result, )
             
+class AsyncOutputMultiLineTextWithBatchNode:
+    def __init__(self):
+        pass
 
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "touch": ("BOOLEAN", { "forceInput": True }),
+                "eof_size": ("INT", { "forceInput": True }),
+                "text": ("STRING", { "multiline": True }),
+                "remove_words": ("LIST", { "forceInput": True }),
+                "delimiter": ("STRING", { "multiline": False, "default": "\n" }),
+                "skip_empty": ("BOOLEAN", { "default": True }),
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("text_line",)
+    CATEGORY = f'{MAIN_CATEGORY}/WorkFlowTool'
+    FUNCTION = "batch_text_yield"
+    
+    def batch_text_yield(self, touch, eof_size, text, remove_words, delimiter="\n", skip_empty=True, unique_id=0):
+        global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
+
+        if unique_id not in ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT:
+            ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id] = 0
+        
+        current_line_index = ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id]
+        ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id] += 1
+
+        prompts = text.split(delimiter)
+
+        if skip_empty:
+            prompts = [p.strip() for p in prompts if p.strip()]
+        else:
+            prompts = [p.strip() for p in prompts]
+        
+        
+        if ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id] == eof_size:
+            del ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id]
+
+        current_line_promts = prompts[current_line_index]
+        for word in remove_words:
+            if isinstance(word, str):
+                current_line_promts = current_line_promts.replace(word, "")
+        
+        return (current_line_promts,)
+    
+    @classmethod
+    def IS_CHANGED(s, touch, eof_size, text, remove_words, delimiter="\n", skip_empty=True, unique_id=0):
+	    return float('nan')
