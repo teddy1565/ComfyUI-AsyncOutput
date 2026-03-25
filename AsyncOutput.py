@@ -32,8 +32,12 @@ ASYNC_OUTPUT_EXTRA_KEY = "ASYNC_OUTPUT"
 ASYNC_OUTPUT_INIT_SINGAL_KEY = "INIT_SIGNAL"
 
 def onprompt(json_data):
-    
-    data_info = json_data.workflow.extra
+    # print(list(json_data.keys()))
+    # print(list(json_data["extra_data"].keys()))
+    # print(list(json_data["extra_data"]["extra_pnginfo"].keys()))
+    # print(list(json_data["extra_data"]["extra_pnginfo"]["workflow"].keys()))
+    # print(list(json_data["extra_data"]["extra_pnginfo"]["workflow"]["extra"].keys()))
+    data_info = json_data["extra_data"]["extra_pnginfo"]["workflow"]["extra"]
 
     if ASYNC_OUTPUT_EXTRA_KEY not in data_info:
         data_info[ASYNC_OUTPUT_EXTRA_KEY] = {}
@@ -42,7 +46,7 @@ def onprompt(json_data):
 
     if ASYNC_OUTPUT_INIT_SINGAL_KEY not in ASYNC_OUTPUT_EXTRA_DICT:
         ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
-    data_info[ASYNC_OUTPUT_EXTRA_KEY][ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
+    ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
 
     return json_data
 
@@ -361,6 +365,7 @@ class AsyncOutputInitSignalOutputNode:
 
         WORKFLOW = "workflow"
         EXTRA = "extra"
+        print(list(extra_pnginfo.keys()))
         if WORKFLOW in extra_pnginfo:
             if EXTRA in extra_pnginfo[WORKFLOW]:
                 if ASYNC_OUTPUT_EXTRA_KEY in extra_pnginfo[WORKFLOW][EXTRA]:
