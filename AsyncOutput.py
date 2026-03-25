@@ -257,7 +257,7 @@ class AsyncOutputMultiLineTextWithBatchNode:
                 "touch": ("BOOLEAN", { "forceInput": True }),
                 "eof_size": ("INT", { "forceInput": True }),
                 "text": ("STRING", { "multiline": True }),
-                "remove_words": ("LIST", { "forceInput": True }),
+                "remove_words": ("*", { "forceInput": True }),
                 "delimiter": ("STRING", { "multiline": False, "default": "\n" }),
                 "skip_empty": ("BOOLEAN", { "default": True }),
             },
@@ -272,6 +272,10 @@ class AsyncOutputMultiLineTextWithBatchNode:
     FUNCTION = "batch_text_yield"
     
     def batch_text_yield(self, touch, eof_size, text, remove_words, delimiter="\n", skip_empty=True, unique_id=0):
+
+        if isinstance(remove_words, list) == False:
+            raise Exception(f'ERROR: "remove_words" data type not "list". remove_words: {type(remove_words)}')
+        
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
 
         if unique_id not in ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT:
