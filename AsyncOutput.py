@@ -16,6 +16,8 @@ import nodes
 import folder_paths
 import comfy.utils
 import comfy_execution
+from server import PromptServer
+
 
 
 
@@ -24,6 +26,25 @@ MAIN_CATEGORY = "AsyncOutput"
 ASYNC_OUTPUT_STORAGE_DATA = {}
 ASYNC_OUTPUT_COUNTER = {}
 ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT = {}
+
+
+ASYNC_OUTPUT_EXTRA_KEY = "ASYNC_OUTPUT"
+ASYNC_OUTPUT_INIT_SINGAL_KEY = "INIT_SIGNAL"
+
+def onprompt(json_data):
+
+    if ASYNC_OUTPUT_EXTRA_KEY not in json_data.extra:
+        json_data.extra[ASYNC_OUTPUT_EXTRA_KEY] = {}
+
+    ASYNC_OUTPUT_EXTRA_DICT = json_data.extra[ASYNC_OUTPUT_EXTRA_KEY]
+
+    if ASYNC_OUTPUT_INIT_SINGAL_KEY not in ASYNC_OUTPUT_EXTRA_DICT:
+        ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
+    json_data.extra[ASYNC_OUTPUT_EXTRA_KEY][ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
+
+    return json_data
+
+PromptServer.instance.on_prompt_handlers.append(onprompt)
 
 class AsyncOutputCollectionNode:
     def __init__(self):
@@ -278,6 +299,10 @@ class AsyncOutputMultiLineTextWithBatchNode:
         
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
 
+        if touch != True:
+            return (comfy_execution.graph.ExecutionBlocker(None), )
+        
+
         if unique_id not in ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT:
             ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id] = 0
         
@@ -306,4 +331,49 @@ class AsyncOutputMultiLineTextWithBatchNode:
     
     @classmethod
     def IS_CHANGED(s, touch, eof_size, text, delimiter="\n", skip_empty=True, remove_words=[], unique_id=0):
+	    return float('nan')
+
+class AsyncOutputInitSignalOutputNode:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "always_output": ("BOOLEAN", { "default": False, "tooltip": "if false, only emit once. else every runtime loop tick send." })
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID",
+                "prompt": "PROMPT",
+                "extra_pnginfo": "EXTRA_PNGINFO",
+            }
+        }
+    
+    RETURN_TYPES = ("BOOLEAN",)
+    RETURN_NAMES = ("init_signal",)
+    CATEGORY = f'{MAIN_CATEGORY}/WorkFlowTool'
+    FUNCTION = "init_signal"
+    
+    def init_signal(self, mode, unique_id, prompt, extra_pnginfo):
+
+        WORKFLOW = "workflow"
+        EXTRA = "extra"
+        if WORKFLOW in extra_pnginfo:
+            if EXTRA in extra_pnginfo[WORKFLOW]:
+                if ASYNC_OUTPUT_EXTRA_KEY in extra_pnginfo[WORKFLOW][EXTRA]:
+                    if ASYNC_OUTPUT_INIT_SINGAL_KEY in extra_pnginfo[WORKFLOW][EXTRA][ASYNC_OUTPUT_EXTRA_KEY]:
+                        if extra_pnginfo[WORKFLOW][EXTRA][ASYNC_OUTPUT_EXTRA_KEY][ASYNC_OUTPUT_INIT_SINGAL_KEY] == False:
+                            extra_pnginfo[WORKFLOW][EXTRA][ASYNC_OUTPUT_EXTRA_KEY][ASYNC_OUTPUT_INIT_SINGAL_KEY] = True
+                            return (True, )
+                        else:
+                            if mode == True:
+                                return (False, )
+    
+        return (comfy_execution.graph.ExecutionBlocker(None), )
+
+        
+    
+    @classmethod
+    def IS_CHANGED(s, mode, unique_id, prompt, extra_pnginfo):
 	    return float('nan')

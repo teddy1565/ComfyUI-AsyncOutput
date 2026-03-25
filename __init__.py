@@ -13,6 +13,7 @@ NODE_CLASS_MAPPINGS = {
     "AsyncOutputCallback": AsyncOutput.AsyncOutputCallbackNode,
     "AsyncOutputConvertStringListToString": AsyncOutput.AsyncOutputConvertStringListToStringNode,
     "AsyncOutputMultiLineTextWithBatch": AsyncOutput.AsyncOutputMultiLineTextWithBatchNode,
+    "AsyncOutputInitSignalOutput": AsyncOutput.AsyncOutputInitSignalOutputNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -20,7 +21,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AsyncOutputEmitter": "Conditions",
     "AsyncOutputCallback": "Output",
     "AsyncOutputConvertStringListToString": "String List To String",
-    "AsyncOutputMultiLineTextWithBatch": "Batch Text Yield With Batch"
+    "AsyncOutputMultiLineTextWithBatch": "Batch Text Yield With Batch",
+    "AsyncOutputInitSignalOutput": "Init Singal Output",
 }
 
 __all__ = [
