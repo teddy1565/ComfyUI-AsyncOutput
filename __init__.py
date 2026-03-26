@@ -16,6 +16,7 @@ NODE_CLASS_MAPPINGS = {
     "AsyncOutputInitSignalOutput": AsyncOutput.AsyncOutputInitSignalOutputNode,
     "AsyncOutputRemoteCollection": AsyncOutput.AsyncOutputRemoteCollectionNode,
     "AsyncOutputRemoteTrigger": AsyncOutput.AsyncOutputRemoteTriggerNode,
+    "AsyncOutputGlobalAutoReset": AsyncOutput.AsyncOutputGlobalAutoResetNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -27,6 +28,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AsyncOutputInitSignalOutput": "Init Singal Output",
     "AsyncOutputRemoteCollection": "Remote Collect",
     "AsyncOutputRemoteTrigger": "Remote Trigger",
+    "AsyncOutputGlobalAutoReset": "AsyncOutput[module_config] Global Auto Reset",
 }
 
 __all__ = [
