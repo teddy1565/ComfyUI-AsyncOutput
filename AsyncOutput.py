@@ -519,7 +519,7 @@ class AsyncOutputConvertStringListToStringNode:
     RETURN_TYPES = ("STRING", )
     RETURN_NAMES = ("strings", )
     
-    CATEGORY = f'{MAIN_CATEGORY}/Utils'
+    CATEGORY = f'{MAIN_CATEGORY}/String'
     FUNCTION = "convert_string_list_to_string"
     DESCRIPTION = \
 """
