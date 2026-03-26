@@ -118,7 +118,13 @@ class BatchIteratorGlobalCacheClearNode:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "force_clear": ("BOOLEAN", { "default": True })
+                "silent_mode": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "If True, Node Never raise Error, inturrept thread. but not recommend, because you forget it. will be disaster."
+                }),
+                "force_clear": ("BOOLEAN", {
+                    "default": True
+                })
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID"
@@ -135,19 +141,23 @@ class BatchIteratorGlobalCacheClearNode:
     Remove BatchIterator All GlobalCache
     """
 
-    def clear_cache(self, force_clear=True, unique_id=0):
+    def clear_cache(self, silent_mode=False, force_clear=True, unique_id=0):
         global ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT
         
         if force_clear == True:
             for k in list(ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT.keys()):
                 del ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT[k]
-            raise Exception("WARRNING: Module AsyncOutput.BatchIterator All GlobalCache are reset, please remove the CacheClear Node or Disable force_clear.")
+            if silent_mode == False:
+                raise Exception("WARRNING: Module AsyncOutput.BatchIterator All GlobalCache are reset, please remove the CacheClear Node or Disable force_clear.")
+            else:
+                print("WARRNING: Module AsyncOutput.BatchIterator All GlobalCache are reset, please remove the CacheClear Node or Disable force_clear.")
+                return (comfy_execution.graph.ExecutionBlocker(None), )
         
         return (comfy_execution.graph.ExecutionBlocker(None), )
         
 
     @classmethod
-    def IS_CHANGED(self, force_clear=True, unique_id=0):
+    def IS_CHANGED(self, silent_mode=False, force_clear=True, unique_id=0):
 	    return float('nan')
     
 class BatchIteratorStringCollectionNode:
