@@ -27,6 +27,7 @@ ASYNC_OUTPUT_GLOBAL_AUTO_RESET = True
 ASYNC_OUTPUT_STORAGE_DATA = {}
 ASYNC_OUTPUT_COUNTER = {}
 ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT = {}
+ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT = {}
 
 ASYNC_OUTPUT_REMOTE_CONTROL_DATA = {}
 ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT = {}
@@ -131,12 +132,14 @@ class AsyncOutputGlobalManualResetNode:
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
         global ASYNC_OUTPUT_REMOTE_CONTROL_DATA
         global ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT
+        global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT
 
         ASYNC_OUTPUT_STORAGE_DATA = {}
         ASYNC_OUTPUT_COUNTER = {}
         ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT = {}
         ASYNC_OUTPUT_REMOTE_CONTROL_DATA = {}
         ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT = {}
+        ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT = {}
 
         print(f'[AsyncOutput]: Current AUTO_RESET on {"`Enabled`" if ASYNC_OUTPUT_GLOBAL_AUTO_RESET == True else "`Disabled`"}')
         print(f'[AsyncOutput]: Enabled -> each Run Batch auto Reset | Disabled -> Never Auto Reset, Until ComfyUI process exit')
@@ -433,10 +436,10 @@ class AsyncOutputRemoteTriggerNode:
             tick_count = ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id]
             if tick_count == -1 and tick_count < count:
                 ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id] += 1
-                return (True, 0, )
+                return (True, -1, )
             elif tick_count < count:
-                ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id] += 1
                 tick_index = ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id]
+                ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id] += 1
                 return (res, tick_index, )
             else:
                 return (False, -1, )
@@ -517,10 +520,12 @@ class AsyncOutputMultiLineTextWithBatchNode:
                 "touch": ("BOOLEAN", { "forceInput": True }),
                 "eof_size": ("INT", { "forceInput": True }),
                 "text": ("STRING", { "multiline": True }),
+                "with_tick": ("BOOLEAN", { "default": False }),
                 "delimiter": ("STRING", { "multiline": False, "default": "\n" }),
                 "skip_empty": ("BOOLEAN", { "default": True }),
             },
             "optional": {
+                "tick_index": ("INT", { "forceInput": True }),
                 "remove_words": ("*", { "forceInput": True })
             },
             "hidden": {
@@ -533,12 +538,30 @@ class AsyncOutputMultiLineTextWithBatchNode:
     CATEGORY = f'{MAIN_CATEGORY}/WorkFlowTool'
     FUNCTION = "batch_text_yield"
     
-    def batch_text_yield(self, touch, eof_size, text, delimiter="\n", skip_empty=True, remove_words=[], unique_id=0):
+    def batch_text_yield(self, touch, eof_size, text, with_tick, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], unique_id=0):
         
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
+        global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT
 
         if touch != True:
             return (comfy_execution.graph.ExecutionBlocker(None), )
+        
+        if isinstance(with_tick, bool) == False:
+            with_tick = bool(with_tick)
+        
+        if with_tick == True:
+            if isinstance(tick_index, int) == False:
+                tick_index = int(tick_index)
+            if math.isnan(tick_index):
+                raise Exception("ERROR: tick_index not int.")
+
+            if unique_id not in ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT:
+                ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT[unique_id] = 0
+            if tick_index >= ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT[unique_id]:
+                return (comfy_execution.graph.ExecutionBlocker(None), )
+            if tick_index < ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT[unique_id]:
+                ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT[unique_id] += 1
+            
         
 
         if unique_id not in ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT:
@@ -568,7 +591,7 @@ class AsyncOutputMultiLineTextWithBatchNode:
         return (current_line_promts,)
     
     @classmethod
-    def IS_CHANGED(s, touch, eof_size, text, delimiter="\n", skip_empty=True, remove_words=[], unique_id=0):
+    def IS_CHANGED(s, touch, eof_size, text, with_tick, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], unique_id=0):
 	    return float('nan')
 
 class AsyncOutputInitSignalOutputNode:
