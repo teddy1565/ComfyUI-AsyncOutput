@@ -263,7 +263,7 @@ class AsyncOutputRemoteTriggerNode:
         return {
             "required": {
                 "key_id": ("STRING", {  }),
-                "conditions": ("INT", { "default": 1, "min": 1 }),
+                "conditions": ("INT", { "default": 1, "min": 0 }),
                 "mode": (["==", "<", ">", "<=", ">=", "!="], {"default": "=="})
             },
             "optional": {
