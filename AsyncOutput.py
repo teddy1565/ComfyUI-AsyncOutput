@@ -394,8 +394,6 @@ class AsyncOutputRemoteTriggerNode:
 
         if isinstance(conditions, int) == False:
             conditions = int(conditions)
-        if math.isnan(conditions) == True:
-            raise Exception(f'ERROR: `conditions` data type not int. `conditions`: {type(conditions)}')
 
         if reset == True:
             if key_id in ASYNC_OUTPUT_REMOTE_CONTROL_DATA:
@@ -518,6 +516,7 @@ class AsyncOutputMultiLineTextWithBatchNode:
         return {
             "required": {
                 "touch": ("BOOLEAN", { "forceInput": True }),
+                "after_init_loop": ("BOOLEAN", { "forceInput": True, "lazy": True }),
                 "eof_size": ("INT", { "forceInput": True }),
                 "text": ("STRING", { "multiline": True }),
                 "with_tick": ("BOOLEAN", { "default": False }),
@@ -537,8 +536,14 @@ class AsyncOutputMultiLineTextWithBatchNode:
     RETURN_NAMES = ("text_line",)
     CATEGORY = f'{MAIN_CATEGORY}/WorkFlowTool'
     FUNCTION = "batch_text_yield"
+    DESCRIPTION = \
+    """
+    Async Output Multi Line Text With Batch,
+
+    it can output first line, then wait unit prev workflow loop done, trigger next loop
+    """
     
-    def batch_text_yield(self, touch, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], unique_id=0):
+    def batch_text_yield(self, touch, after_init_loop, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], unique_id=0):
         
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT
@@ -552,8 +557,6 @@ class AsyncOutputMultiLineTextWithBatchNode:
         if with_tick == True:
             if isinstance(tick_index, int) == False:
                 tick_index = int(tick_index)
-            if math.isnan(tick_index):
-                raise Exception("ERROR: tick_index not int.")
 
             if unique_id not in ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT:
                 ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT[unique_id] = 0
@@ -590,8 +593,19 @@ class AsyncOutputMultiLineTextWithBatchNode:
 
         return (current_line_promts,)
     
+    # special method with comfyUI
+    def check_lazy_status(s, touch, after_init_loop, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], unique_id=0):
+        global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
+
+        needed = []
+        if unique_id in ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT and ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id] > 0:
+            needed.append("after_init_loop")
+        
+        return needed
+        
+    
     @classmethod
-    def IS_CHANGED(s, touch, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], unique_id=0):
+    def IS_CHANGED(s, touch, after_init_loop, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], unique_id=0):
 	    return float('nan')
 
 class AsyncOutputInitSignalOutputNode:
