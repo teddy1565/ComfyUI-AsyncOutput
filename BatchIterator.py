@@ -23,6 +23,8 @@ MAIN_CATEGORY = "AsyncOutput/BatchIterator"
 ASYNC_OUTPUT_BATCH_ITERATOR_GLOBAL_AUTO_RESET = True
 
 ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT = {}
+ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT = {}
+ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT = {}
 
 class BatchIteratorMultiLineNode:
     def __init__(self):
@@ -146,4 +148,160 @@ class BatchIteratorGlobalCacheClearNode:
 
     @classmethod
     def IS_CHANGED(self, force_clear=True, unique_id=0):
+	    return float('nan')
+    
+class BatchIteratorStringCollectionNode:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "incoming_input": ("STRING", { "forceInput": True }),
+                "key_id": ("STRING", {})
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("passthough_output",)
+    CATEGORY = f'{MAIN_CATEGORY}/String'
+    FUNCTION = "collect"
+    
+    def collect(self, incoming_input, key_id, unique_id):
+        global ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT
+        
+        if key_id == "":
+            raise Exception("ERROR: key_id property not set.")
+        
+        if key_id not in ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT:
+            ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT[key_id] = []
+        
+        ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT[key_id].append(incoming_input)
+        
+        return (incoming_input,)
+    
+    @classmethod
+    def IS_CHANGED(s, incoming_input, key_id, unique_id):
+	    return float('nan')
+    
+class BatchIteratorStringEmitterNode:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "touch": ("BOOLEAN", { "forceInput": True }),
+                
+                "mode": (["==", ">="], {"default": "=="}),
+                "key_id": ("STRING", {}),
+                "step": ("INT", { "default": 1, "min": 1 }),
+                "conditions": ("INT", { "min": 0, "default": 1 }),
+            },
+            "optional": {
+                "reset": ("BOOLEAN", { "defaultInput": False })
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+    
+    RETURN_TYPES = ("INT", "BOOLEAN",)
+    RETURN_NAMES = ("count", "emit_result",)
+    OUTPUT_TOOLTIPS = ("Current Count Value", "if count == conditions, return true. then remove this record")
+    CATEGORY = f'{MAIN_CATEGORY}/String'
+    FUNCTION = "emit"
+    
+    def emit(self, touch, mode, key_id, step=1, conditions=1, reset=False, unique_id=0):
+        global ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT
+
+        if isinstance(step, int) == False:
+            step = int(step)
+        if isinstance(conditions, int) == False:
+            conditions = int(conditions)
+        
+        if math.isnan(step) or math.isnan(conditions):
+            raise Exception(f'ERROR: step or conditions data type not int. step: {type(step)}, conditions: {type(conditions)}')
+
+        if key_id not in ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT:
+            ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT[key_id] = 0
+        k = ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT[key_id]
+
+        if reset == True:
+            ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT[key_id] = 0
+            return (k, False)
+
+        if touch == False:
+            return (k, False)
+        else:
+            if key_id not in ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT:
+                ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT[key_id] = 0
+            ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT[key_id] += step
+        
+       
+        emit_result = False
+
+        if mode == "==" and ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT[key_id] == conditions:
+            emit_result = True
+        elif mode == ">=" and ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT[key_id] >= conditions:
+            emit_result = True
+        
+        return (k, emit_result)
+    
+    @classmethod
+    def IS_CHANGED(s, touch, step, conditions, mode, key_id, reset=False, unique_id=0):
+	    return float('nan')
+
+class BatchIteratorStringCallbackNode:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "emitter_result": ("BOOLEAN", { "forceInput": True }),
+                "key_id": ("STRING", {  })
+            },
+            "optional": {
+                "reset": ("BOOLEAN", { "defaultInput": False })
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+    
+    RETURN_TYPES = ("LIST", )
+    RETURN_NAMES = ("output_list", )
+    
+    CATEGORY = f'{MAIN_CATEGORY}/String'
+    FUNCTION = "get_collection"
+    
+    def get_collection(self, emitter_result, key_id, reset=False, unique_id=0):
+        global ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT
+
+        if reset == True:
+            if key_id in ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT:
+                del ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT[key_id]
+            return (comfy_execution.graph.ExecutionBlocker(None), )
+        
+        if emitter_result == False:
+            return (comfy_execution.graph.ExecutionBlocker(None), )
+        
+        if emitter_result == True:
+            if key_id not in ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT:
+                return (comfy_execution.graph.ExecutionBlocker(None), )
+        
+            data = ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT[key_id]
+            return (data, )
+        
+        return (comfy_execution.graph.ExecutionBlocker(None), )
+                
+    @classmethod
+    def IS_CHANGED(s, emitter_result, key_id, reset=False, unique_id=0):
 	    return float('nan')

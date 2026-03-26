@@ -7,6 +7,7 @@
 
 from . import AsyncOutput
 from . import BatchIterator
+from . import Utils
 
 NODE_CLASS_MAPPINGS = {
     "AsyncOutputCollect": AsyncOutput.AsyncOutputCollectionNode,
@@ -22,6 +23,11 @@ NODE_CLASS_MAPPINGS = {
 
     "BatchIteratorMultiLine": BatchIterator.BatchIteratorMultiLineNode,
     "BatchIteratorGlobalCacheClear": BatchIterator.BatchIteratorGlobalCacheClearNode,
+    "BatchIteratorStringCollection": BatchIterator.BatchIteratorStringCollectionNode,
+    "BatchIteratorStringEmitter": BatchIterator.BatchIteratorStringEmitterNode,
+    "BatchIteratorStringCallback": BatchIterator.BatchIteratorStringCallbackNode,
+
+    "UtilsConvertStringListToStringNode": Utils.AsyncOutputUtilsConvertStringListToStringNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -38,6 +44,11 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
     "BatchIteratorMultiLine": "Multiline Text Iterator",
     "BatchIteratorGlobalCacheClear": "BatchIterator GlobalCache Clear",
+    "BatchIteratorStringCollection": "BatchIterator String Collection",
+    "BatchIteratorStringEmitter": "BatchIterator String Emitter",
+    "BatchIteratorStringCallback": "BatchIterator String Callback",
+
+    "UtilsConvertStringListToStringNode": "StringList To String",
 }
 
 __all__ = [
