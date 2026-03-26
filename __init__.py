@@ -14,6 +14,8 @@ NODE_CLASS_MAPPINGS = {
     "AsyncOutputConvertStringListToString": AsyncOutput.AsyncOutputConvertStringListToStringNode,
     "AsyncOutputMultiLineTextWithBatch": AsyncOutput.AsyncOutputMultiLineTextWithBatchNode,
     "AsyncOutputInitSignalOutput": AsyncOutput.AsyncOutputInitSignalOutputNode,
+    "AsyncOutputRemoteCollection": AsyncOutput.AsyncOutputRemoteCollectionNode,
+    "AsyncOutputRemoteTrigger": AsyncOutput.AsyncOutputRemoteTriggerNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -23,6 +25,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AsyncOutputConvertStringListToString": "String List To String",
     "AsyncOutputMultiLineTextWithBatch": "Batch Text Yield With Batch",
     "AsyncOutputInitSignalOutput": "Init Singal Output",
+    "AsyncOutputRemoteCollection": "Remote Collect",
+    "AsyncOutputRemoteTrigger": "Remote Trigger",
 }
 
 __all__ = [

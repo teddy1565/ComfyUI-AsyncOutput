@@ -27,6 +27,7 @@ ASYNC_OUTPUT_STORAGE_DATA = {}
 ASYNC_OUTPUT_COUNTER = {}
 ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT = {}
 
+ASYNC_OUTPUT_REMOTE_CONTROL_DATA = {}
 
 ASYNC_OUTPUT_EXTRA_KEY = "ASYNC_OUTPUT"
 ASYNC_OUTPUT_INIT_SINGAL_KEY = "INIT_SIGNAL"
@@ -213,6 +214,107 @@ class AsyncOutputCallbackNode:
                 
     @classmethod
     def IS_CHANGED(s, emitter_result, key_id, reset=False, unique_id=0):
+	    return float('nan')
+
+class AsyncOutputRemoteCollectionNode:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "touch": ("BOOLEAN", { "forceInput": True }),
+                "key_id": ("STRING", {})
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+    
+    RETURN_TYPES = ("BOOLEAN",)
+    RETURN_NAMES = ("passthough_output",)
+    CATEGORY = f'{MAIN_CATEGORY}/RemoteControl'
+    FUNCTION = "collect"
+    
+    def collect(self, touch, key_id, unique_id):
+        global ASYNC_OUTPUT_REMOTE_CONTROL_DATA
+        
+        if key_id == "":
+            raise Exception("ERROR: key_id property not set.")
+        
+        if key_id not in ASYNC_OUTPUT_REMOTE_CONTROL_DATA:
+            ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id] = 0
+        
+        ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id] += 1
+        
+        return (touch,)
+    
+    @classmethod
+    def IS_CHANGED(s, touch, key_id, unique_id):
+	    return float('nan')
+
+class AsyncOutputRemoteTriggerNode:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "key_id": ("STRING", {  }),
+                "conditions": ("INT", { "default": 1, "min": 1 }),
+                "mode": (["==", "<", ">", "<=", ">=", "!="], {"default": "=="})
+            },
+            "optional": {
+                "reset": ("BOOLEAN", { "defaultInput": False })
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+    
+    RETURN_TYPES = ("BOOLEAN", )
+    RETURN_NAMES = ("bool", )
+    OUTPUT_NODE = True
+    CATEGORY = f'{MAIN_CATEGORY}/RemoteControl'
+    FUNCTION = "remote_trigger"
+    DESCRIPTION = \
+    """
+    Remote Trigger, If conditions true, return true else false
+    """
+    
+    def remote_trigger(self, key_id, conditions, mode, reset=False, unique_id=0):
+        global ASYNC_OUTPUT_REMOTE_CONTROL_DATA
+
+        if isinstance(conditions, int) == False:
+            conditions = int(conditions)
+        if math.isnan(conditions) == True:
+            raise Exception(f'ERROR: `conditions` data type not int. `conditions`: {type(conditions)}')
+
+        if reset == True:
+            if key_id in ASYNC_OUTPUT_REMOTE_CONTROL_DATA:
+                del ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id]
+            return (False, )
+        
+        res = False
+        if mode == "==":
+            res = (conditions == ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id])
+        elif mode == "!=":
+            res = (conditions != ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id])
+        elif mode == ">":
+            res = (conditions > ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id])
+        elif mode == "<":
+            res = (conditions < ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id])
+        elif mode == ">=":
+            res = (conditions >= ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id])
+        elif mode == "<=":
+            res = (conditions <= ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id])
+
+        return (res, )
+                
+    @classmethod
+    def IS_CHANGED(s, key_id, conditions, mode, reset=False, unique_id=0):
 	    return float('nan')
             
 
