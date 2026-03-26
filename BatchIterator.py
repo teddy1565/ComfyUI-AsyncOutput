@@ -97,6 +97,8 @@ class BatchIteratorMultiLineNode:
                 return (comfy_execution.graph.ExecutionBlocker(None), comfy_execution.graph.ExecutionBlocker(None), )
             if mode == "overflow":
                 current_index = current_index % text_line_count
+        else:
+            ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT[persistence_memory_key_id] += 1
         
         text_ln = prompts[current_index]
 
