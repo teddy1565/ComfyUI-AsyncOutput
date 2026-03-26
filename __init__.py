@@ -21,6 +21,7 @@ NODE_CLASS_MAPPINGS = {
     "AsyncOutputGlobalManualReset": AsyncOutput.AsyncOutputGlobalManualResetNode,
 
     "BatchIteratorMultiLine": BatchIterator.BatchIteratorMultiLineNode,
+    "BatchIteratorGlobalCacheClear": BatchIterator.BatchIteratorGlobalCacheClearNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -36,6 +37,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AsyncOutputGlobalManualReset": "AsyncOutput[module_config] Global Memory Reset",
 
     "BatchIteratorMultiLine": "Multiline Text Iterator",
+    "BatchIteratorGlobalCacheClear": "BatchIterator GlobalCache Clear",
 }
 
 __all__ = [

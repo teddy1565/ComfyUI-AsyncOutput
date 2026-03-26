@@ -73,6 +73,10 @@ class BatchIteratorMultiLineNode:
 
     def text_yield(self, persistence_memory_key_id, text, delimiter="\n", skip_empty=True, mode="fixed", force_reset=False, unique_id=0):
         global ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT
+        if force_reset == True:
+            if persistence_memory_key_id in ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT:
+                del ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT[persistence_memory_key_id]
+        
         if persistence_memory_key_id not in ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT:
             ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT[persistence_memory_key_id] = 0
 
@@ -98,4 +102,44 @@ class BatchIteratorMultiLineNode:
 
     @classmethod
     def IS_CHANGED(self, persistence_memory_key_id, text, delimiter="\n", mode="fixed", skip_empty=True, force_reset=False, unique_id=0):
+	    return float('nan')
+
+class BatchIteratorGlobalCacheClearNode:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "force_clear": ("BOOLEAN", { "default": True })
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+
+    RETURN_TYPES = ("BOOLEAN", )
+    RETURN_NAMES = ("void", )
+    CATEGORY = f'{MAIN_CATEGORY}/SystemTools'
+    FUNCTION = "clear_cache"
+    OUTPUT_NODE = True
+    DESCRIPTION = \
+    """
+    Remove BatchIterator All GlobalCache
+    """
+
+    def clear_cache(self, force_clear=True, unique_id=0):
+        global ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT
+        
+        if force_clear == True:
+            for k in list(ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT.keys()):
+                del ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT[k]
+            raise Exception("WARRNING: Module AsyncOutput.BatchIterator All GlobalCache are reset, please remove the CacheClear Node or Disable force_clear.")
+        
+        return (comfy_execution.graph.ExecutionBlocker(None), )
+        
+
+    @classmethod
+    def IS_CHANGED(self, force_clear=True, unique_id=0):
 	    return float('nan')
