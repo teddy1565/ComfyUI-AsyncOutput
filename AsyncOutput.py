@@ -389,7 +389,6 @@ class AsyncOutputMultiLineTextWithBatchNode:
                 "touch": ("BOOLEAN", { "forceInput": True }),
                 "eof_size": ("INT", { "forceInput": True }),
                 "text": ("STRING", { "multiline": True }),
-                "remove_words": ("*", { "forceInput": True }),
                 "delimiter": ("STRING", { "multiline": False, "default": "\n" }),
                 "skip_empty": ("BOOLEAN", { "default": True }),
             },
