@@ -365,3 +365,54 @@ class BatchIteratorErrorException:
     @classmethod
     def IS_CHANGED(self, singal=False, silent_mode=False, unique_id=0):
 	    return float('nan')
+    
+class BatchIteratorStoreProbe:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "key_id": ("STRING", {  }),
+                "singal": ("BOOLEAN", { "default": False }),
+                "target_dict": (["multiline_text_iterator_count", "storage_data_dict", "storage_data_counter"], {
+                    "default": "multiline_text_iterator_count"
+                })
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+    
+    RETURN_TYPES = ("BOOLEAN", )
+    RETURN_NAMES = ("void", )
+    OUTPUT_NODE = True
+    CATEGORY = f'{MAIN_CATEGORY}/SystemTools'
+    FUNCTION = "probe"
+    DESCRIPTION = \
+    """
+    Show Specify Data
+    """
+    
+    def probe(self, key_id="", singal=False, target_dict="multiline_text_iterator_count", unique_id=0):
+        global ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT
+        global ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT
+        global ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT
+
+        lib_dict = {}
+        lib_dict["multiline_text_iterator_count"] = ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT
+        lib_dict["storage_data_dict"] = ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT
+        lib_dict["storage_data_counter"] = ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT
+
+        if singal == True:
+            if key_id in lib_dict[target_dict]:
+                print(f"[AsyncOutput] BatchIterator_StoreProbe:\t dict: {target_dict}\n\tkey: {key_id}\n\tvalue: {lib_dict[target_dict][key_id]}")
+            else:
+                print(f"[AsyncOutput] BatchIterator_StoreProbe:\t dict: {target_dict}, not a vaild key in this dict, key_id: {key_id}")
+        
+        return (singal, )
+                
+    @classmethod
+    def IS_CHANGED(self, key_id="", singal=False, target_dict="multiline_text_iterator_count", unique_id=0):
+	    return float('nan')

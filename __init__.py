@@ -27,6 +27,7 @@ NODE_CLASS_MAPPINGS = {
     "BatchIteratorStringEmitter": BatchIterator.BatchIteratorStringEmitterNode,
     "BatchIteratorStringCallback": BatchIterator.BatchIteratorStringCallbackNode,
     "BatchIteratorErrorException": BatchIterator.BatchIteratorErrorException,
+    "BatchIteratorStoreProbe": BatchIterator.BatchIteratorStoreProbe,
 
     "UtilsConvertStringListToStringNode": Utils.AsyncOutputUtilsConvertStringListToStringNode,
 }
@@ -49,6 +50,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "BatchIteratorStringEmitter": "BatchIterator String Emitter",
     "BatchIteratorStringCallback": "BatchIterator String Callback",
     "BatchIteratorErrorException": "Active error triggering",
+    "BatchIteratorStoreProbe": "BatchIterator Store Probe",
 
     "UtilsConvertStringListToStringNode": "StringList To String",
 }
