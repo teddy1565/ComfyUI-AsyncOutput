@@ -98,7 +98,7 @@ class AsyncOutputGlobalAutoResetNode:
             return (comfy_execution.graph.ExecutionBlocker(None), )
     
     @classmethod
-    def IS_CHANGED(s, incoming_input, key_id, unique_id):
+    def IS_CHANGED(s, global_auto_reset, unique_id):
 	    return float('nan')
 
 class AsyncOutputCollectionNode:
