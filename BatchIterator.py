@@ -143,10 +143,17 @@ class BatchIteratorGlobalCacheClearNode:
 
     def clear_cache(self, silent_mode=False, force_clear=True, unique_id=0):
         global ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT
+        global ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT
+        global ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT
         
         if force_clear == True:
             for k in list(ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT.keys()):
                 del ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT[k]
+            for k in list(ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT.keys()):
+                del ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_DICT[k]
+            for k in list(ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT.keys()):
+                del ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT[k]
+            
             if silent_mode == False:
                 raise Exception("WARRNING: Module AsyncOutput.BatchIterator All GlobalCache are reset, please remove the CacheClear Node or Disable force_clear.")
             else:
