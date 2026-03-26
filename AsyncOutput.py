@@ -297,6 +297,9 @@ class AsyncOutputRemoteTriggerNode:
                 del ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id]
             return (False, )
         
+        if key_id not in ASYNC_OUTPUT_REMOTE_CONTROL_DATA:
+            return (False, )
+        
         res = False
         if mode == "==":
             res = (conditions == ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id])
