@@ -6,6 +6,7 @@
 """
 
 from . import AsyncOutput
+from . import BatchIterator
 
 NODE_CLASS_MAPPINGS = {
     "AsyncOutputCollect": AsyncOutput.AsyncOutputCollectionNode,
@@ -18,6 +19,8 @@ NODE_CLASS_MAPPINGS = {
     "AsyncOutputRemoteTrigger": AsyncOutput.AsyncOutputRemoteTriggerNode,
     "AsyncOutputGlobalAutoReset": AsyncOutput.AsyncOutputGlobalAutoResetNode,
     "AsyncOutputGlobalManualReset": AsyncOutput.AsyncOutputGlobalManualResetNode,
+
+    "BatchIteratorMultiLine": BatchIterator.BatchIteratorMultiLineNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -31,6 +34,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AsyncOutputRemoteTrigger": "Remote Trigger",
     "AsyncOutputGlobalAutoReset": "AsyncOutput[module_config] Global Auto Reset",
     "AsyncOutputGlobalManualReset": "AsyncOutput[module_config] Global Memory Reset",
+
+    "BatchIteratorMultiLine": "Multiline Text Iterator",
 }
 
 __all__ = [

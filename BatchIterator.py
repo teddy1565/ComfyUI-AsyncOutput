@@ -64,7 +64,7 @@ class BatchIteratorMultiLineNode:
 
     RETURN_TYPES = ("STRING", "INT", )
     RETURN_NAMES = ("text_line", "count", )
-    CATEGORY = f'{MAIN_CATEGORY}/Multiline Text Iterator'
+    CATEGORY = f'{MAIN_CATEGORY}/String'
     FUNCTION = "text_yield"
     DESCRIPTION = \
     """
