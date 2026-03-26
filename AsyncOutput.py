@@ -384,8 +384,9 @@ class AsyncOutputRemoteCollectionNode:
             # 等待實作
             if isinstance(multiline_tick_index, int) == False:
                 multiline_tick_index = int(multiline_tick_index)
-            
-            if isinstance(multiline_trigger_control_unique_id, str) == False:
+            if multiline_trigger_control_unique_id == None:
+                raise Exception("ERROR: (in remote control collect) with_AsyncOutput_multiline_prompt_batch enabled, must input a vaild string")
+            elif isinstance(multiline_trigger_control_unique_id, str) == False:
                 multiline_trigger_control_unique_id = str(multiline_trigger_control_unique_id)
             if multiline_trigger_control_unique_id == "":
                 raise Exception("ERROR: multiline_trigger_control_unique_id must a not empty string.")
@@ -533,7 +534,7 @@ support list:
 - `\\`
 """
     
-    def convert_string_list_to_string(self, input_string_list=[], join_word="", is_escape_char=False):
+    def convert_string_list_to_string(self, input_string_list=None, join_word="", is_escape_char=False):
         
         if isinstance(input_string_list, list) == False:
             raise Exception("ERROR: input_string_list not a list.")
@@ -610,7 +611,7 @@ class AsyncOutputMultiLineTextWithBatchNode:
     it can output first line, then wait unit prev workflow loop done, trigger next loop
     """
     
-    def batch_text_yield(self, touch, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], with_remote_control_collect=False, multiline_trigger_control_unique_id="", after_init_loop=False, unique_id=0):
+    def batch_text_yield(self, touch, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=None, with_remote_control_collect=False, multiline_trigger_control_unique_id="", after_init_loop=False, unique_id=0):
         
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT
@@ -651,6 +652,8 @@ class AsyncOutputMultiLineTextWithBatchNode:
         if ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id] == eof_size:
             del ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id]
 
+        if current_line_index >= len(prompts):
+            current_line_index = current_line_index % len(prompts)
         current_line_promts = prompts[current_line_index]
         
         if isinstance(remove_words, list):
@@ -666,7 +669,9 @@ class AsyncOutputMultiLineTextWithBatchNode:
 
         needed = []
         if with_remote_control_collect == True:
-            if isinstance(multiline_trigger_control_unique_id, str) == False:
+            if multiline_trigger_control_unique_id == None:
+                raise Exception("ERROR: with_remote_control_collect enabled, must input a vaild string")
+            elif isinstance(multiline_trigger_control_unique_id, str) == False:
                 multiline_trigger_control_unique_id = str(multiline_trigger_control_unique_id)
             if multiline_trigger_control_unique_id == "":
                 raise Exception(f"ERROR: (in batch_text_yield)[unique_id: {unique_id}] multiline_trigger_control_unique_id must a not empty string.")
