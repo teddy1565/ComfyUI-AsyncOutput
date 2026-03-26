@@ -218,7 +218,11 @@ class BatchIteratorStringEmitterNode:
                 "mode": (["==", ">="], {"default": "=="}),
                 "key_id": ("STRING", {}),
                 "step": ("INT", { "default": 1, "min": 1 }),
-                "conditions": ("INT", { "min": 0, "default": 1 }),
+                "conditions": ("INT", {
+                    "min": 0,
+                    "default": 1,
+                    "tooltip": "if input -999, will raise, it's a active interrupt signal"
+                }),
             },
             "optional": {
                 "reset": ("BOOLEAN", { "defaultInput": False })
@@ -244,6 +248,8 @@ class BatchIteratorStringEmitterNode:
         
         if math.isnan(step) or math.isnan(conditions):
             raise Exception(f'ERROR: step or conditions data type not int. step: {type(step)}, conditions: {type(conditions)}')
+        if conditions == -999:
+            raise Exception(f'ERROR: [AsyncOutput] BatchIterator StringEmitterNode Receive, Received an active interrupt request')
 
         if key_id not in ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT:
             ASYNC_OUTPUT_BATCH_ITERATOR_STORAGE_DATA_COUNTER_DICT[key_id] = 0
