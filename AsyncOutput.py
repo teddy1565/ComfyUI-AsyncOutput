@@ -375,8 +375,8 @@ class AsyncOutputRemoteTriggerNode:
             }
         }
     
-    RETURN_TYPES = ("BOOLEAN", )
-    RETURN_NAMES = ("bool", )
+    RETURN_TYPES = ("BOOLEAN", "INT", )
+    RETURN_NAMES = ("bool", "tick_index", )
     OUTPUT_NODE = True
     CATEGORY = f'{MAIN_CATEGORY}/RemoteControl'
     FUNCTION = "remote_trigger"
@@ -399,7 +399,7 @@ class AsyncOutputRemoteTriggerNode:
                 del ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id]
             if key_id in ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT:
                 del ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id]
-            return (False, )
+            return (False, -1, )
         
         if tick_output == True:
             if key_id not in ASYNC_OUTPUT_REMOTE_CONTROL_DATA:
@@ -410,10 +410,11 @@ class AsyncOutputRemoteTriggerNode:
                 
 
         if key_id not in ASYNC_OUTPUT_REMOTE_CONTROL_DATA:
-            return (False, )
+            return (False, -1, )
         
         
         res = False
+        tick_index = -1
         if mode == "==":
             res = (conditions == ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id])
         elif mode == "!=":
@@ -432,15 +433,16 @@ class AsyncOutputRemoteTriggerNode:
             tick_count = ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id]
             if tick_count == -1 and tick_count < count:
                 ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id] += 1
-                return (True, )
+                return (True, 0, )
             elif tick_count < count:
                 ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id] += 1
-                return (res, )
+                tick_index = ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id]
+                return (res, tick_index, )
             else:
-                return (False, )
+                return (False, -1, )
 
 
-        return (res, )
+        return (res, tick_index, )
                 
     @classmethod
     def IS_CHANGED(s, key_id, conditions, mode, tick_output=False, reset=False, unique_id=0):
