@@ -6,6 +6,8 @@
 """
 
 from . import AsyncOutput
+from . import BatchIterator
+from . import Utils
 
 NODE_CLASS_MAPPINGS = {
     "AsyncOutputCollect": AsyncOutput.AsyncOutputCollectionNode,
@@ -18,6 +20,16 @@ NODE_CLASS_MAPPINGS = {
     "AsyncOutputRemoteTrigger": AsyncOutput.AsyncOutputRemoteTriggerNode,
     "AsyncOutputGlobalAutoReset": AsyncOutput.AsyncOutputGlobalAutoResetNode,
     "AsyncOutputGlobalManualReset": AsyncOutput.AsyncOutputGlobalManualResetNode,
+
+    "BatchIteratorMultiLine": BatchIterator.BatchIteratorMultiLineNode,
+    "BatchIteratorGlobalCacheClear": BatchIterator.BatchIteratorGlobalCacheClearNode,
+    "BatchIteratorStringCollection": BatchIterator.BatchIteratorStringCollectionNode,
+    "BatchIteratorStringEmitter": BatchIterator.BatchIteratorStringEmitterNode,
+    "BatchIteratorStringCallback": BatchIterator.BatchIteratorStringCallbackNode,
+    "BatchIteratorErrorException": BatchIterator.BatchIteratorErrorException,
+    "BatchIteratorStoreProbe": BatchIterator.BatchIteratorStoreProbe,
+
+    "UtilsConvertStringListToStringNode": Utils.AsyncOutputUtilsConvertStringListToStringNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -31,6 +43,16 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AsyncOutputRemoteTrigger": "Remote Trigger",
     "AsyncOutputGlobalAutoReset": "AsyncOutput[module_config] Global Auto Reset",
     "AsyncOutputGlobalManualReset": "AsyncOutput[module_config] Global Memory Reset",
+
+    "BatchIteratorMultiLine": "Multiline Text Iterator",
+    "BatchIteratorGlobalCacheClear": "BatchIterator GlobalCache Clear",
+    "BatchIteratorStringCollection": "BatchIterator String Collection",
+    "BatchIteratorStringEmitter": "BatchIterator String Emitter",
+    "BatchIteratorStringCallback": "BatchIterator String Callback",
+    "BatchIteratorErrorException": "Active error triggering",
+    "BatchIteratorStoreProbe": "BatchIterator Store Probe",
+
+    "UtilsConvertStringListToStringNode": "StringList To String",
 }
 
 __all__ = [

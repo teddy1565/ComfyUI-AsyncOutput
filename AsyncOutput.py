@@ -4,6 +4,11 @@
 @Nickname: AsyncOutput
 @Version: 0.0.1 ALPHA
 @URL: https://github.com/teddy1565/ComfyUI-AsyncOutput
+
+
+NOT RECOMMENDED USE, Because ComfyUI not real support change status in upstream on a workflow.
+
+So Many Design not real match this scheduler(scope), it't not a real Turing complete.
 """
 
 import os
@@ -21,7 +26,7 @@ from server import PromptServer
 
 
 
-MAIN_CATEGORY = "AsyncOutput"
+MAIN_CATEGORY = "AsyncOutput/Deprecated(ComfyUI NOT Turing complete)"
 ASYNC_OUTPUT_GLOBAL_AUTO_RESET = True
 
 ASYNC_OUTPUT_STORAGE_DATA = {}
@@ -519,7 +524,7 @@ class AsyncOutputConvertStringListToStringNode:
     RETURN_TYPES = ("STRING", )
     RETURN_NAMES = ("strings", )
     
-    CATEGORY = f'{MAIN_CATEGORY}/Utils'
+    CATEGORY = f'{MAIN_CATEGORY}/String'
     FUNCTION = "convert_string_list_to_string"
     DESCRIPTION = \
 """
