@@ -11,7 +11,13 @@ NODE_CLASS_MAPPINGS = {
     "AsyncOutputCollect": AsyncOutput.AsyncOutputCollectionNode,
     "AsyncOutputEmitter": AsyncOutput.AsyncOutputEmitterNode,
     "AsyncOutputCallback": AsyncOutput.AsyncOutputCallbackNode,
-    "AsyncOutputConvertStringListToString": AsyncOutput.AsyncOutputConvertStringListToStringNode
+    "AsyncOutputConvertStringListToString": AsyncOutput.AsyncOutputConvertStringListToStringNode,
+    "AsyncOutputMultiLineTextWithBatch": AsyncOutput.AsyncOutputMultiLineTextWithBatchNode,
+    "AsyncOutputInitSignalOutput": AsyncOutput.AsyncOutputInitSignalOutputNode,
+    "AsyncOutputRemoteCollection": AsyncOutput.AsyncOutputRemoteCollectionNode,
+    "AsyncOutputRemoteTrigger": AsyncOutput.AsyncOutputRemoteTriggerNode,
+    "AsyncOutputGlobalAutoReset": AsyncOutput.AsyncOutputGlobalAutoResetNode,
+    "AsyncOutputGlobalManualReset": AsyncOutput.AsyncOutputGlobalManualResetNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -19,6 +25,12 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AsyncOutputEmitter": "Conditions",
     "AsyncOutputCallback": "Output",
     "AsyncOutputConvertStringListToString": "String List To String",
+    "AsyncOutputMultiLineTextWithBatch": "Batch Text Yield With Batch",
+    "AsyncOutputInitSignalOutput": "Init Singal Output",
+    "AsyncOutputRemoteCollection": "Remote Collect",
+    "AsyncOutputRemoteTrigger": "Remote Trigger",
+    "AsyncOutputGlobalAutoReset": "AsyncOutput[module_config] Global Auto Reset",
+    "AsyncOutputGlobalManualReset": "AsyncOutput[module_config] Global Memory Reset",
 }
 
 __all__ = [
