@@ -22,6 +22,7 @@ from server import PromptServer
 
 
 MAIN_CATEGORY = "AsyncOutput"
+ASYNC_OUTPUT_GLOBAL_AUTO_RESET = True
 
 ASYNC_OUTPUT_STORAGE_DATA = {}
 ASYNC_OUTPUT_COUNTER = {}
@@ -54,16 +55,51 @@ def onprompt(json_data):
     if ASYNC_OUTPUT_INIT_REMOTE_CONTROL_KEY not in ASYNC_OUTPUT_EXTRA_DICT:
         remote_control_data_keys = list(ASYNC_OUTPUT_REMOTE_CONTROL_DATA.keys())
         remote_control_tick_keys = list(ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT.keys())
-        for k in remote_control_data_keys:
-            del ASYNC_OUTPUT_REMOTE_CONTROL_DATA[k]
-        for k in remote_control_tick_keys:
-            del ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[k]
+        if ASYNC_OUTPUT_GLOBAL_AUTO_RESET == True:
+            for k in remote_control_data_keys:
+                del ASYNC_OUTPUT_REMOTE_CONTROL_DATA[k]
+            for k in remote_control_tick_keys:
+                del ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[k]
         
         ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_REMOTE_CONTROL_KEY] = True
 
     return json_data
 
 PromptServer.instance.on_prompt_handlers.append(onprompt)
+
+class AsyncOutputGlobalAutoResetNode:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "global_auto_reset": ("BOOLEAN", { "default": True })
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+    
+    OUTPUT_NODE = True
+    RETURN_TYPES = ("BOOLEAN",)
+    RETURN_NAMES = ("AsyncOutputModule_AutoReset",)
+    CATEGORY = f'{MAIN_CATEGORY}/Global'
+    FUNCTION = "auto_reset"
+    
+    def auto_reset(self, global_auto_reset):
+        global ASYNC_OUTPUT_GLOBAL_AUTO_RESET
+
+        if isinstance(global_auto_reset, bool):
+            ASYNC_OUTPUT_GLOBAL_AUTO_RESET = global_auto_reset
+            return (ASYNC_OUTPUT_GLOBAL_AUTO_RESET, )
+        else:
+            return (comfy_execution.graph.ExecutionBlocker(None), )
+    
+    @classmethod
+    def IS_CHANGED(s, incoming_input, key_id, unique_id):
+	    return float('nan')
 
 class AsyncOutputCollectionNode:
     def __init__(self):
