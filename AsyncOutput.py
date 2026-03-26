@@ -31,6 +31,7 @@ ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT = {}
 
 ASYNC_OUTPUT_REMOTE_CONTROL_DATA = {}
 ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT = {}
+ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT = {}
 
 ASYNC_OUTPUT_EXTRA_KEY = "ASYNC_OUTPUT"
 ASYNC_OUTPUT_INIT_SINGAL_KEY = "INIT_SIGNAL"
@@ -53,15 +54,32 @@ def onprompt(json_data):
         ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
     ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
 
-    if ASYNC_OUTPUT_INIT_REMOTE_CONTROL_KEY not in ASYNC_OUTPUT_EXTRA_DICT:
+    if ASYNC_OUTPUT_GLOBAL_AUTO_RESET == True:
         remote_control_data_keys = list(ASYNC_OUTPUT_REMOTE_CONTROL_DATA.keys())
         remote_control_tick_keys = list(ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT.keys())
-        if ASYNC_OUTPUT_GLOBAL_AUTO_RESET == True:
-            for k in remote_control_data_keys:
-                del ASYNC_OUTPUT_REMOTE_CONTROL_DATA[k]
-            for k in remote_control_tick_keys:
-                del ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[k]
-        
+        remote_control_with_multiline_text_tick_keys = list(ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT.keys())
+        async_output_storage_data = list(ASYNC_OUTPUT_STORAGE_DATA.keys())
+        async_output_counter_data = list(ASYNC_OUTPUT_COUNTER.keys())
+        async_output_multiline_yield_id_data = list(ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT.keys())
+        async_output_multiline_yield_tick_data = list(ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT.keys())
+
+        for k in remote_control_data_keys:
+            del ASYNC_OUTPUT_REMOTE_CONTROL_DATA[k]
+        for k in remote_control_tick_keys:
+            del ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[k]
+        for k in remote_control_with_multiline_text_tick_keys:
+            del ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT[k]
+        for k in async_output_storage_data:
+            del ASYNC_OUTPUT_STORAGE_DATA[k]
+        for k in async_output_counter_data:
+            del ASYNC_OUTPUT_COUNTER[k]
+        for k in async_output_multiline_yield_id_data:
+            del ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[k]
+        for k in async_output_multiline_yield_tick_data:
+            del ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT[k]
+
+
+    if ASYNC_OUTPUT_INIT_REMOTE_CONTROL_KEY not in ASYNC_OUTPUT_EXTRA_DICT:
         ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_REMOTE_CONTROL_KEY] = True
 
     return json_data
@@ -133,6 +151,7 @@ class AsyncOutputGlobalManualResetNode:
         global ASYNC_OUTPUT_REMOTE_CONTROL_DATA
         global ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT
+        global ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT
 
         ASYNC_OUTPUT_STORAGE_DATA = {}
         ASYNC_OUTPUT_COUNTER = {}
@@ -140,6 +159,7 @@ class AsyncOutputGlobalManualResetNode:
         ASYNC_OUTPUT_REMOTE_CONTROL_DATA = {}
         ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT = {}
         ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT = {}
+        ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT = {}
 
         print(f'[AsyncOutput]: Current AUTO_RESET on {"`Enabled`" if ASYNC_OUTPUT_GLOBAL_AUTO_RESET == True else "`Disabled`"}')
         print(f'[AsyncOutput]: Enabled -> each Run Batch auto Reset | Disabled -> Never Auto Reset, Until ComfyUI process exit')
@@ -328,7 +348,21 @@ class AsyncOutputRemoteCollectionNode:
         return {
             "required": {
                 "touch": ("BOOLEAN", { "forceInput": True }),
-                "key_id": ("STRING", {})
+                "key_id": ("STRING", {}),
+                "with_AsyncOutput_multiline_prompt_batch": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "if want sync multiline prompt batch, need enable this."
+                }),
+            },
+            "optional": {
+                "multiline_trigger_control_unique_id": ("STRING", {
+                    "forceInput": True,
+                    "tooltip": "should input a unique_id, AsyncOutput multi text node will reference this id."
+                }),
+                "multiline_tick_index": ("INT", {
+                    "default": -1,
+                    "tooltip": "a group shared reference same tick. sync this group tick"
+                }),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID"
@@ -340,9 +374,26 @@ class AsyncOutputRemoteCollectionNode:
     CATEGORY = f'{MAIN_CATEGORY}/RemoteControl'
     FUNCTION = "collect"
     
-    def collect(self, touch, key_id, unique_id):
+    def collect(self, touch, key_id, with_AsyncOutput_multiline_prompt_batch=False, multiline_trigger_control_unique_id="", multiline_tick_index=-1, unique_id=0):
         global ASYNC_OUTPUT_REMOTE_CONTROL_DATA
+        global ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT
+
         
+        
+        if with_AsyncOutput_multiline_prompt_batch == True:
+            # 等待實作
+            if isinstance(multiline_tick_index, int) == False:
+                multiline_tick_index = int(multiline_tick_index)
+            
+            if isinstance(multiline_trigger_control_unique_id, str) == False:
+                multiline_trigger_control_unique_id = str(multiline_trigger_control_unique_id)
+            if multiline_trigger_control_unique_id == "":
+                raise Exception("ERROR: multiline_trigger_control_unique_id must a not empty string.")
+            
+            if multiline_trigger_control_unique_id not in ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT:
+                ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT[multiline_trigger_control_unique_id] = 0
+            ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT[multiline_trigger_control_unique_id] += 1
+
         if key_id == "":
             raise Exception("ERROR: key_id property not set.")
         
@@ -354,7 +405,7 @@ class AsyncOutputRemoteCollectionNode:
         return (touch,)
     
     @classmethod
-    def IS_CHANGED(s, touch, key_id, unique_id):
+    def IS_CHANGED(s, touch, key_id, with_AsyncOutput_multiline_prompt_batch=False, multiline_trigger_control_unique_id=-1, multiline_tick_index=-1, unique_id=0):
 	    return float('nan')
 
 class AsyncOutputRemoteTriggerNode:
@@ -516,16 +567,32 @@ class AsyncOutputMultiLineTextWithBatchNode:
         return {
             "required": {
                 "touch": ("BOOLEAN", { "forceInput": True }),
-                "after_init_loop": ("BOOLEAN", { "forceInput": True, "lazy": True }),
                 "eof_size": ("INT", { "forceInput": True }),
                 "text": ("STRING", { "multiline": True }),
-                "with_tick": ("BOOLEAN", { "default": False }),
+                "with_tick": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "Recommend use false, else maybe blocking downstream"
+                }),
                 "delimiter": ("STRING", { "multiline": False, "default": "\n" }),
                 "skip_empty": ("BOOLEAN", { "default": True }),
             },
             "optional": {
                 "tick_index": ("INT", { "forceInput": True }),
-                "remove_words": ("*", { "forceInput": True })
+                "remove_words": ("*", { "forceInput": True }),
+                "with_remote_control_collect": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "If want control a loop, enable this, it will sync with a remote control collect node"
+                }),
+                "multiline_trigger_control_unique_id": ("STRING", {
+                    "forceInput": True,
+                    "tooltip": "must use same unique_id with othter multiline trigger and remote control collect node"
+                }),
+                "after_init_loop": ("BOOLEAN", {
+                    "forceInput": True,
+                    "lazy": True,
+                    "default": False,
+                    "tooltip": "If enable with_remote_control_collect, must with this singal index"
+                }),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID"
@@ -543,7 +610,7 @@ class AsyncOutputMultiLineTextWithBatchNode:
     it can output first line, then wait unit prev workflow loop done, trigger next loop
     """
     
-    def batch_text_yield(self, touch, after_init_loop, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], unique_id=0):
+    def batch_text_yield(self, touch, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], with_remote_control_collect=False, multiline_trigger_control_unique_id="", after_init_loop=False, unique_id=0):
         
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
         global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_TICK_DICT
@@ -594,18 +661,23 @@ class AsyncOutputMultiLineTextWithBatchNode:
         return (current_line_promts,)
     
     # special method with comfyUI
-    def check_lazy_status(s, touch, after_init_loop, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], unique_id=0):
-        global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
+    def check_lazy_status(self, touch, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], with_remote_control_collect=False, multiline_trigger_control_unique_id="", after_init_loop=False, unique_id=0):
+        global ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT
 
         needed = []
-        if unique_id in ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT and ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT[unique_id] > 0:
-            needed.append("after_init_loop")
+        if with_remote_control_collect == True:
+            if isinstance(multiline_trigger_control_unique_id, str) == False:
+                multiline_trigger_control_unique_id = str(multiline_trigger_control_unique_id)
+            if multiline_trigger_control_unique_id == "":
+                raise Exception(f"ERROR: (in batch_text_yield)[unique_id: {unique_id}] multiline_trigger_control_unique_id must a not empty string.")
+            if multiline_trigger_control_unique_id in ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT and ASYNC_OUTPUT_REMOTE_CONTROL_WITH_MULTI_LINE_TEXT_TICK_ID_DICT[multiline_trigger_control_unique_id] > 0:
+                needed.append("after_init_loop")
         
         return needed
         
     
     @classmethod
-    def IS_CHANGED(s, touch, after_init_loop, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], unique_id=0):
+    def IS_CHANGED(self, touch, eof_size, text, with_tick=False, delimiter="\n", skip_empty=True, tick_index=-1, remove_words=[], with_remote_control_collect=False, multiline_trigger_control_unique_id="", after_init_loop=False, unique_id=0):
 	    return float('nan')
 
 class AsyncOutputInitSignalOutputNode:
