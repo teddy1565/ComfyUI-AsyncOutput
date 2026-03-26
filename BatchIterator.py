@@ -322,3 +322,40 @@ class BatchIteratorStringCallbackNode:
     @classmethod
     def IS_CHANGED(s, emitter_result, key_id, reset=False, unique_id=0):
 	    return float('nan')
+    
+class BatchIteratorErrorException:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "singal": ("BOOLEAN", { "defaultInput": True, "default": False }),
+                "silent_mode": ("BOOLEAN", { "default": False, }),
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+    
+    RETURN_TYPES = ("BOOLEAN", )
+    RETURN_NAMES = ("void", )
+    
+    CATEGORY = f'{MAIN_CATEGORY}/SystemTools'
+    FUNCTION = "on_error"
+    
+    def on_error(self, singal=False, silent_mode=False, unique_id=0):
+        
+        if singal == True:
+            print("[AsyncOutput]: BatchIteratorErrorException")
+            if silent_mode == True:
+                return (comfy_execution.graph.ExecutionBlocker(None), )
+            else:
+                raise Exception("ERROR: [AsyncOutput]->BatchIterator | Active Error Exception.")
+        
+        return (singal, )
+                
+    @classmethod
+    def IS_CHANGED(self, singal=False, silent_mode=False, unique_id=0):
+	    return float('nan')
