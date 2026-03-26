@@ -32,6 +32,7 @@ ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT = {}
 
 ASYNC_OUTPUT_EXTRA_KEY = "ASYNC_OUTPUT"
 ASYNC_OUTPUT_INIT_SINGAL_KEY = "INIT_SIGNAL"
+ASYNC_OUTPUT_INIT_REMOTE_CONTROL_KEY = "REMOTE_CONTROL_DATA_INITED"
 
 def onprompt(json_data):
     # print(list(json_data.keys()))
@@ -49,6 +50,16 @@ def onprompt(json_data):
     if ASYNC_OUTPUT_INIT_SINGAL_KEY not in ASYNC_OUTPUT_EXTRA_DICT:
         ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
     ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_SINGAL_KEY] = False
+
+    if ASYNC_OUTPUT_INIT_REMOTE_CONTROL_KEY not in ASYNC_OUTPUT_EXTRA_DICT:
+        remote_control_data_keys = list(ASYNC_OUTPUT_REMOTE_CONTROL_DATA.keys())
+        remote_control_tick_keys = list(ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT.keys())
+        for k in remote_control_data_keys:
+            del ASYNC_OUTPUT_REMOTE_CONTROL_DATA[k]
+        for k in remote_control_tick_keys:
+            del ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[k]
+        
+        ASYNC_OUTPUT_EXTRA_DICT[ASYNC_OUTPUT_INIT_REMOTE_CONTROL_KEY] = True
 
     return json_data
 
