@@ -73,9 +73,11 @@ class BatchIteratorMultiLineNode:
 
     def text_yield(self, persistence_memory_key_id, text, delimiter="\n", skip_empty=True, mode="fixed", force_reset=False, unique_id=0):
         global ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT
+
         if force_reset == True:
             if persistence_memory_key_id in ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT:
                 del ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT[persistence_memory_key_id]
+            (comfy_execution.graph.ExecutionBlocker(None), comfy_execution.graph.ExecutionBlocker(None), )
         
         if persistence_memory_key_id not in ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT:
             ASYNC_OUTPUT_BATCH_ITERATOR_MULTILINE_TEXT_ITERATOR_DICT[persistence_memory_key_id] = 0
