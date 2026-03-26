@@ -331,7 +331,10 @@ class AsyncOutputRemoteTriggerNode:
         if tick_output == True:
             count = ASYNC_OUTPUT_REMOTE_CONTROL_DATA[key_id]
             tick_count = ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id]
-            if tick_count < count:
+            if tick_count == -1 and tick_count < count:
+                ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id] += 1
+                return (True, )
+            elif tick_count < count:
                 ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT[key_id] += 1
                 return (res, )
             else:
