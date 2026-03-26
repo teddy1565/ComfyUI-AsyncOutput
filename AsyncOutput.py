@@ -88,7 +88,7 @@ class AsyncOutputGlobalAutoResetNode:
     CATEGORY = f'{MAIN_CATEGORY}/Global'
     FUNCTION = "auto_reset"
     
-    def auto_reset(self, global_auto_reset):
+    def auto_reset(self, global_auto_reset, unique_id):
         global ASYNC_OUTPUT_GLOBAL_AUTO_RESET
 
         if isinstance(global_auto_reset, bool):
