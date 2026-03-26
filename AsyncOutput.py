@@ -67,6 +67,8 @@ def onprompt(json_data):
 
 PromptServer.instance.on_prompt_handlers.append(onprompt)
 
+# ======================================================== Global Config Node ========================================
+
 class AsyncOutputGlobalAutoResetNode:
     def __init__(self):
         pass
@@ -100,6 +102,56 @@ class AsyncOutputGlobalAutoResetNode:
     @classmethod
     def IS_CHANGED(s, global_auto_reset, unique_id):
 	    return float('nan')
+class AsyncOutputGlobalManualResetNode:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "reset_all_memory": ("BOOLEAN", { "default": False })
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID"
+            }
+        }
+    
+    OUTPUT_NODE = True
+    RETURN_TYPES = ("BOOLEAN",)
+    RETURN_NAMES = ("reset result",)
+    CATEGORY = f'{MAIN_CATEGORY}/Global/ManualOperation'
+    FUNCTION = "manual_reset"
+    
+    def manual_reset(self, reset_all_memory, unique_id):
+        global ASYNC_OUTPUT_GLOBAL_AUTO_RESET
+
+        global ASYNC_OUTPUT_STORAGE_DATA
+        global ASYNC_OUTPUT_COUNTER
+        global ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT
+        global ASYNC_OUTPUT_REMOTE_CONTROL_DATA
+        global ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT
+
+        ASYNC_OUTPUT_STORAGE_DATA = {}
+        ASYNC_OUTPUT_COUNTER = {}
+        ASYNC_OUTPUT_MULTI_LINE_TEXT_YIELD_ID_DECT = {}
+        ASYNC_OUTPUT_REMOTE_CONTROL_DATA = {}
+        ASYNC_OUTPUT_REMOTE_CONTROL_TICK_DICT = {}
+
+        print(f'[AsyncOutput]: Current AUTO_RESET on {"`Enabled`" if ASYNC_OUTPUT_GLOBAL_AUTO_RESET == True else "`Disabled`"}')
+        print(f'[AsyncOutput]: Enabled -> each Run Batch auto Reset | Disabled -> Never Auto Reset, Until ComfyUI process exit')
+
+        if isinstance(reset_all_memory, bool):
+            ASYNC_OUTPUT_GLOBAL_AUTO_RESET = reset_all_memory
+            return (ASYNC_OUTPUT_GLOBAL_AUTO_RESET, )
+        else:
+            return (comfy_execution.graph.ExecutionBlocker(None), )
+    
+    @classmethod
+    def IS_CHANGED(s, reset_all_memory, unique_id):
+	    return float('nan')
+
+# ============================================================================================================
 
 class AsyncOutputCollectionNode:
     def __init__(self):
